@@ -1,5 +1,5 @@
 const mongoose = require( 'mongoose' );
-
+const {Actors} = require('./actor-model');
 const moviesSchema = mongoose.Schema({
     movie_ID : {
         type : Number,
@@ -20,7 +20,7 @@ const moviesSchema = mongoose.Schema({
     },
     actors : [{
         type : mongoose.Schema.Types.ObjectId,
-        ref : 'authors',
+        ref : 'actors',
         required : true
     }]
 });
@@ -37,11 +37,43 @@ const Movies = {
                 .catch( err => {
                     throw new Error( err );
                 });
+    },
+    getMovieByID : function(id){
+        return moviesCollection
+        .findOne({movie_ID: id})
+        .then(Movie =>{
+            return Movie;
+        })
+        .catch(err=>{
+            throw new Error( err );
+        })
+    },
+    addActorToMovieList : function(id,actor_name){
+        return moviesCollection
+        .findOne({movie_ID: id})
+        .then(movie =>{
+            Actors.getActorByName(actor_name)
+        .then(actor=>{
+           movie.actors.push(actor._id);
+            console.log(movie.actors);
+            movie.save();
+            return movie;
+            
+        })
+        .catch(err=>{
+            throw new Error( err );
+        })
+        })
+        .catch(err=>{
+            throw new Error( err );
+        })
     }
+
+}
     /*
         Your code goes here
     */
-}
+
 
 module.exports = {
     Movies
